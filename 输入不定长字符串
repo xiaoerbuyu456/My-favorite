@@ -27,9 +27,11 @@
 	}
 	printf("\n");
 //主要是对（void *）malloc（n*sizeof(a)）与void *realloc(void *ptr,size_t size);函数的使用
-(1) malloc（）、calloc（）
-从堆上面分配内存
+(1) malloc（）
+    从堆上面分配内存
 (2) realloc（）
-在之前分配内存块的基础上面，重新分配，使内存变大或变小
-(3) free（）
-释放已分配的内存区域。
+    在之前分配内存块的基础上面，重新分配，使内存变大或变小
+(3)calloc:
+   从堆上分配内存并清零
+(4) free（）
+   释放已分配的内存区域。
