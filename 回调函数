@@ -1,0 +1,46 @@
+理解方式一：
+typedef int (*CallBackFun)(char *p);//为回调函数命名，类型命名为CallBackFun，参数为char *p
+int Afun(char *p)
+{
+	cout<<"Afun callback%s\n"<<p<<endl;
+	cout<<"Afun callback1"<<endl;
+	cout<<"Afun callback2"<<endl;
+	return 0;
+
+}
+int Cfun(char *p)
+{
+	cout<<"Cfun callback%s\n"<<p<<endl;
+	cout<<"Cfun callback1"<<endl;
+	cout<<"Cfun callback2"<<endl;
+	cout<<"Cfun callback3"<<endl;
+	cout<<"Cfun callback4"<<endl;
+	return 0;
+}
+//执行回调函数方式一
+int call(CallBackFun pCallBack, char *p)
+{
+	cout<<"cout type one callback%s\n"<<p<<endl;
+ 	pCallBack(p);
+    cout<<"After callback1\n"<<endl;
+	cout<<"After callback2\n"<<endl;
+	cout<<"After callback3\n"<<endl;
+	cout<<"After callback4\n"<<endl;
+	cout<<"After callback5\n"<<endl;
+	return 0;
+}
+执行回掉函数方法二
+int call2(char *p, int (*ptr)())
+{
+	printf("=======\n");
+	(*ptr)(p);
+
+}
+int main(array<System::String ^> ^args)
+{
+    Console::WriteLine(L"Hello World");
+ 	cout<<"Afun回调函数字符\n"<<endl;
+	char *p ="hello";
+	call(Afun,p);//使用回调方式一进行调用回调函数Afun
+	call(Cfun,p);//使用回调方式一进行调用回调函数Cfun
+}
