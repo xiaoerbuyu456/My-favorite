@@ -1,0 +1,33 @@
+void* CopyMemoryBlock(void* destinationAddress, const void* sourceAddress, int blockNumber)
+{
+	void* result = destinationAddress;
+	const int blockSize = 1024;
+    int byteLength = blockNumber * blockSize;		
+	if(destinationAddress == NULL || sourceAddress == NULL || destinationAddress == sourceAddress)
+		    return NULL;
+	//This situation means that there is no memory overlap, then you should start copying from the lower address.	 
+    if(destinationAddress < sourceAddress || (char*) destinationAddress > (char*) sourceAddress + byteLength)
+    {
+		    while(byteLength--)
+        {
+			*(char*) destinationAddress = *(char*) sourceAddress;
+			destinationAddress = (char*) destinationAddress + 1;
+			sourceAddress = (char*) sourceAddress + 1;
+		}			 
+	}
+    else//Have memory overlap, start copying from high address
+    {
+		destinationAddress = (char*) destinationAddress + byteLength - 1;
+		sourceAddress = (char*) sourceAddress + byteLength -1;
+		while(byteLength--)
+		{
+			*(char*) destinationAddress = *(char*) sourceAddress;
+			destinationAddress = (char*) destinationAddress - 1;
+			sourceAddress = (char*) sourceAddress - 1;
+		}
+	}
+	printf("the function is good!\n");
+	return result;
+}
+
+思考：怎样四个字节四个字节拷贝，上面例子是一个字节一个字节拷贝
