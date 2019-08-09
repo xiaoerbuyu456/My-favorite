@@ -1,0 +1,234 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul  9 09:16:33 2019
+
+Purpose:
+    UM(Harman) data analysis
+ 
+Description:
+    Analysis of the frequency and distribution of the LBA reading and writing
+
+"""
+
+import xlsxwriter
+import csv
+from datetime import datetime
+from collections import Counter
+import matplotlib.pyplot as plt
+from pandas import Series
+
+
+#Import CSV file and processing, spread out the size to the list
+def init_originaldata():
+    readLbaList = []
+    writeLbaList = []
+    lbaSize=0
+    with open('./UsageModel_EBU.csv', 'r',\
+              encoding='utf-8') as file:
+        readerFile = csv.reader(file)
+        #headerFile = next(readerFile)
+        #Statistics the number of the LBA reading and Writing
+        for rowExcel in readerFile: 
+            lbaState = rowExcel[0]
+            currentLba = int(rowExcel[1])
+            lbaSize = int(rowExcel[2])
+            lbaSize -= 1
+            if lbaState == 'read':
+                readLbaList.append(currentLba)
+                if lbaSize > 0:   
+                    while lbaSize > 0:
+                        readLbaList.append(currentLba + lbaSize)
+                        lbaSize -= 1
+            if lbaState == 'write':
+                writeLbaList.append(currentLba)
+                if lbaSize > 0:
+                    while lbaSize > 0:
+                        writeLbaList.append(currentLba + lbaSize)
+                        lbaSize -= 1
+        readLbaListCounter = Counter(readLbaList)
+        writeLbaListCounter = Counter(writeLbaList)  
+        #The item[0] to item[1], will be carried out in accordance with the Number order
+        readLbaData=dict(sorted(dict(readLbaListCounter).items(),\
+                                key=lambda item:item[1]))
+        writeLbaData=dict(sorted(dict(writeLbaListCounter).items(),\
+                                 key=lambda item:item[1]))
+        return readLbaData,writeLbaData 
+
+#generate lba excel
+def generate_excel(readLbaData,writeLbaData):
+    print('begin to generate_excel')
+    #generate excel's name
+    workbook = xlsxwriter.Workbook('./LbaResult.xlsx')
+    #generate the sheet's name of read lba data 
+    worksheet = workbook.add_worksheet('readLbaData')   
+    #sheet init 
+    excelMaxRowNumber=1048576
+    worksheet.set_column(1, 1, 15)
+    #genetate read Lba Data and write data to sheet
+    rowExcelRead = 1
+    colExcelRead = 0
+    changeStandard = 0
+    excelReadChange = 1
+   # chartVal = 1
+    #begin to write excel with read lba
+    print('begin to write excel for read lba')       
+    worksheet.write_string(0,0,'Read/Write')
+    worksheet.write_string(0,1,'LBA')
+    worksheet.write_string(0,2,'Number')
+    for item in readLbaData:
+        if  changeStandard <= excelReadChange*excelMaxRowNumber:       
+            worksheet.write_string(rowExcelRead,colExcelRead,'read')
+            worksheet.write_number(rowExcelRead,colExcelRead+1,item)
+            worksheet.write_number(rowExcelRead,colExcelRead+2,readLbaData[item])
+            rowExcelRead += 1 
+            changeStandard += 1                          
+        else:
+            excelReadChange += 1
+            rowExcelRead = 1
+            colExcelRead += 6         
+    #genetate read Lba Data and write data to sheet2                
+    worksheet = workbook.add_worksheet('writeLbaData') 
+    worksheet.set_column(1, 1, 15)   
+    worksheet.write_string(0,0,'Read/Write')
+    worksheet.write_string(0,1,'LBA')
+    worksheet.write_string(0,2,'Number2') 
+    rowExcelWrite = 1
+    colExcelWrite = 0
+    changeStandard = 0
+    excelWriteChange = 1  
+    print('begin to write excel for write lba')    
+    for item1 in writeLbaData:
+        if changeStandard <= excelWriteChange*excelMaxRowNumber:
+            worksheet.write_string(rowExcelWrite,colExcelWrite,'write')
+            worksheet.write_number(rowExcelWrite,colExcelWrite+1,item1)
+            worksheet.write_number(rowExcelWrite,colExcelWrite+2,writeLbaData[item1])
+            rowExcelWrite += 1
+            changeStandard += 1
+        else:
+           excelWriteChange += 1
+           rowExcelWrite = 1
+           colExcelWrite += 6       
+    workbook.close()
+    print('completed generate_excel')
+#Generate sorting by the Number of images 
+def generate_number_figure(readLbaData,writeLbaData):
+    readLbaData_values=readLbaData.values()
+    writeLbaData_values=writeLbaData.values()
+    plt.figure(num='Read Lba Analysis',figsize=(15,10),frameon=False)
+    plt.plot(readLbaData_values,marker = "2")
+    plt.title('Read LBA Analysis')
+    plt.xlabel("READ-LBA")
+    plt.ylabel("Number")
+    plt.xticks([])
+    plt.show()
+    plt.savefig('ReadLBA(number)666.png',dpi=400,bbox_inches='tight')
+    plt.figure(num='Write Lba Analysis',figsize=(15,10),frameon=False)
+    plt.plot(writeLbaData_values,marker = "2")
+    plt.title('Write LBA Analysis')
+    plt.xlabel("WRITE-LBA")
+    plt.ylabel("Number")
+    plt.xticks([])
+    plt.show()
+    plt.savefig('WriteLBA(number)666.png',dpi=400,bbox_inches='tight')
+#generate scatter figure    
+def generate_scatter_figure(readLbaData,writeLbaData):
+    readLbaData_keys = readLbaData.keys()
+    readLbaData_values = readLbaData.values()
+    plt.figure(num='Read Lba Analysis',figsize=(15,10),frameon=False)
+    plt.title("Read Lba Analysis")
+    plt.xlabel("READ-LBA")
+    plt.ylabel("Number")
+    plt.scatter(readLbaData_keys,readLbaData_values,marker = "2")
+    plt.show()
+    plt.savefig('ReadLBA(scatter).png',dpi=400,bbox_inches='tight') 
+     
+    writeLbaData_keys = writeLbaData.keys()
+    writeLbaData_values = writeLbaData.values()
+    plt.figure(num='Write Lba Analysis',figsize=(15,10),frameon=False)
+    plt.title("Write Lba Analysis")
+    plt.xlabel("WRITE-LBA")
+    plt.ylabel("Number")
+    plt.scatter(writeLbaData_keys,writeLbaData_values,marker = "2")
+    plt.show()
+    plt.savefig('WriteLBA(scatter).png',dpi=400,bbox_inches='tight')
+#generate discount figure
+def generate_discount_figure(readLbaData,writeLbaData):
+    print('begin to generate_picture')
+    readserise=Series(readLbaData)
+    writeserise=Series(writeLbaData)
+    #Read Lba figure
+    plt.figure(num='Read Lba Analysis',figsize=(15,10),frameon=False)
+    readserise.plot(label='ReadLba')
+    plt.legend(loc='best')
+    plt.show()
+    plt.savefig('ReadLBA(discount).png',dpi=400,bbox_inches='tight')
+    #Write Lba figure
+    plt.figure(num='Write Lba Analysis',figsize=(15,10),frameon=False)
+    writeserise.plot(label='WriteLba')
+    plt.legend(loc='best')
+    plt.show()
+    plt.savefig('WriteLBA(discount).png',dpi=400,bbox_inches='tight')
+    #write and read Lba figure
+    plt.figure(num='Write Lba Analysis',figsize=(15,10),frameon=False)
+    readserise.plot(label='ReadLba')
+    writeserise.plot(label='WriteLba')
+    plt.legend(loc='best')
+    plt.show()
+    plt.savefig('ReadWriteLBA(discount).png',dpi=400,bbox_inches='tight')
+    print('competed generate_pictrue')
+
+       
+if __name__ == '__main__': 
+    print("Please waiting a moment")
+    start_time=datetime.now()
+    print('begin to init_orifinaldata')
+    readLbaData,writeLbaData=init_originaldata()
+    #generate_excel(readLbaData,writeLbaData)
+    generate_number_figure(readLbaData,writeLbaData)
+    #generate_scatter_figure(readLbaData,writeLbaData)
+   # generate_discount_figure(readLbaData,writeLbaData)
+    print(datetime.now() - start_time)
+    print("generate read and write lba excel success")
+    
+    
+
+
+
+
+
+
+"""
+#对于number进行排序
+    a=readLbaData.values()
+    b=writeLbaData.values()
+    fig=plt.figure(num='Read Lba Analysis',figsize=(15,10),frameon=False)
+    plt.plot(a)
+    plt.title('ReadLBA')
+    plt.show()
+    plt.savefig('ReadLBA(number).png',dpi=400,bbox_inches='tight')
+    fig=plt.figure(num='Write Lba Analysis',figsize=(15,10),frameon=False)
+    plt.plot(b)
+    plt.title('WriteLBA')
+    plt.show()
+    plt.savefig('WriteLBA(number).png',dpi=400,bbox_inches='tight')
+
+
+
+    thread1 = myThread(1,"Tread1",generate_excel(readLbaData,writeLbaData),readLbaData,writeLbaData)
+    thread2 = myThread(2,"Tread2",generate_picture(readLbaData,writeLbaData),readLbaData,writeLbaData)
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()
+    
+    
+    
+        #creat thread
+    a = Process(target = generate_excel, args= (readLbaData,writeLbaData,) )
+    b = Process(target = generate_picture,args=(readLbaData,writeLbaData,) )    
+    #run thread
+    a.start()
+    b.start()
+    a.join()
+    b.join()
+"""
