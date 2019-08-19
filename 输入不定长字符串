@@ -26,7 +26,7 @@
 		printf("%c",str[j]);
 	}
 	printf("\n");
-//主要是对（void *）malloc（n*sizeof(a)）与void *realloc(void *ptr,size_t size);函数的使用
+//主要是对（void *）malloc（n*sizeof(a)）与void *realloc(void *ptr,size_t size);函数的使用(动态数组)
 (1) malloc（）
     从堆上面分配内存
 (2) realloc（）
