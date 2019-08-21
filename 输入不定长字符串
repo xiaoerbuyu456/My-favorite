@@ -2,7 +2,7 @@
 	int strlen=5;
 	int count=0;
 	char ch;
-	char *str=(char *)malloc(strlen*sizeof(char*));
+	char *str=(char *)malloc(strlen*sizeof(char));
 	printf("please input!\n");
 	while(ch!='\n')
 	{
@@ -10,7 +10,7 @@
 		count++;
 		if(count>=strlen)
 		{
-			str=(char *)realloc(str,sizeof(char*)*(++strlen));
+			str=(char *)realloc(str,sizeof(char)*(++strlen));
 		}
 		str[count-1]=ch;
 	}	
