@@ -1,0 +1,37 @@
+//回文数的判断（本方法判断的长度有限，可以思考一下用字符串或者其它办法进行进阶）
+bool isPalindrome(int x)
+{
+	int pop=0;
+	int rev1=0;
+	int rr=x;
+	if(x<0)
+	{
+		return 0;
+	}
+	else
+	{
+		while(x!=0)
+		{
+		pop=x%10;
+		x /=10;
+		if(rev1>INT_MAX/10||(rev1==INT_MAX/10&&pop>7))
+		{
+			printf("The right end is samll.\n");
+			return 0;
+		}
+			
+		if(rev1<INT_MIN/10||(rev1==INT_MIN/10&&pop<-8))
+		{
+			printf("The lift end is samll.\n");
+			return 0;
+		}
+        rev1=rev1*10+pop;
+		
+		}
+		if(rev1==rr)
+		{
+			printf("is palindrome\n");
+			return 1;
+		}
+	}
+}
