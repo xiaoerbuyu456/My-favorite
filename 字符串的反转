@@ -1,0 +1,23 @@
+void reversestring(char* arr,int n,int l)
+{
+	char *tail=arr+n-1;	
+	for(int i=0;i<l;i++)
+	{
+		printf("%c",*tail);
+		tail--;
+	}
+	for(int i=0;i<n-l;i++)
+	{
+		printf("%c",*arr);
+		arr++;
+	}
+	/*while(tail>=arr)
+	{
+		printf("%c",*tail);
+		tail--;
+	}*/
+	printf("\n");
+}
+	//char arr[8]={'A','B','C','D','E','F','G','H'};
+	char*arr="ABCDEFGH";
+	reversestring(arr,8,2);
